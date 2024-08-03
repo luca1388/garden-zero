@@ -45,7 +45,7 @@ export const ValveController = (() => {
     valves.map((valve) =>
       valve.id === openedValveId
         ? { ...valve, status: "OPENED" }
-        : { ...valve, status: "CLOSED" }
+        : { ...valve, status: "CLOSED" },
     );
 
   const getOpenedValveId = () => openedValveId;

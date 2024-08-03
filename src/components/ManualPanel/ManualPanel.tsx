@@ -24,7 +24,7 @@ const ManualPanel = () => {
         console.log(data);
 
         const openedValve = data.valves.find(
-          (valve: Valve) => valve.status === "OPENED"
+          (valve: Valve) => valve.status === "OPENED",
         )?.id;
 
         if (openedValve) {
@@ -78,7 +78,7 @@ const ManualPanel = () => {
           name={ValveType.Z1}
           id={ValveType.Z1}
           disabled={Boolean(
-            enabledValveName !== "" && enabledValveName !== ValveType.Z1
+            enabledValveName !== "" && enabledValveName !== ValveType.Z1,
           )}
           onClick={clickHandler}
           onChange={(value) => setTimeoutZone1(value)}
