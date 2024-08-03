@@ -1,24 +1,24 @@
 .ValvePanel {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 1em;
-    gap: 16px;
-    min-width: 300px;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 1em;
+  gap: 16px;
+  min-width: 300px;
 }
 
 .ValvePanel .ValvePanel_header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
 }
 
 .ValvePanel .ValvePanel_openedTime {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

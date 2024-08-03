@@ -1,15 +1,27 @@
-import { Button, TextInput } from "@carbon/react";
+import { Button, ButtonSkeleton, TextInput } from "@carbon/react";
 import styles from "./ValvePanel.module.css";
 import { ValveType } from "../ManualPanel";
 
 interface ValvePanelProps {
-  name: ValveType;
+  id: ValveType;
+  name: string;
   defaultTimeOpen?: number;
   disabled: boolean;
-  onClick: (name: ValveType) => void;
+  value: number;
+  onClick: ({ id, timeout }: { id: ValveType; timeout: number }) => void;
+  onChange: (value: number) => void;
+  loading: boolean;
 }
 
-const ValvePanel: React.FC<ValvePanelProps> = ({ name, disabled, onClick }) => {
+const ValvePanel: React.FC<ValvePanelProps> = ({
+  name,
+  id,
+  disabled,
+  onClick,
+  value,
+  onChange,
+  loading,
+}) => {
   return (
     <div className={styles.ValvePanel}>
       <div className={styles.ValvePanel_header}>
@@ -26,11 +38,20 @@ const ValvePanel: React.FC<ValvePanelProps> = ({ name, disabled, onClick }) => {
           placeholder="Valve opened duration"
           defaultValue={5}
           disabled={disabled}
+          value={value}
+          onChange={(event) => onChange(+event.target.value)}
         />
       </div>
-      <Button disabled={disabled} onClick={() => onClick(name)}>
-        Toogle valve
-      </Button>
+      {loading === true ? (
+        <Button
+          disabled={disabled}
+          onClick={() => onClick({ id, timeout: value })}
+        >
+          Toogle valve
+        </Button>
+      ) : (
+        <ButtonSkeleton />
+      )}
     </div>
   );
 };
