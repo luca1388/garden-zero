@@ -7,10 +7,11 @@ interface ValvePanelProps {
   name: string;
   defaultTimeOpen?: number;
   disabled: boolean;
-  value: number;
-  onClick: ({ id, timeout }: { id: ValveType; timeout: number }) => void;
+  value?: number;
+  onClick: ({ id, timeout }: { id: ValveType; timeout?: number }) => void;
   onChange: (value: number) => void;
   loading: boolean;
+  status: "OPENED" | "CLOSED";
 }
 
 const ValvePanel: React.FC<ValvePanelProps> = ({
@@ -21,12 +22,13 @@ const ValvePanel: React.FC<ValvePanelProps> = ({
   value,
   onChange,
   loading,
+  status,
 }) => {
   return (
     <div className={styles.ValvePanel}>
       <div className={styles.ValvePanel_header}>
         <h3>{name}</h3>
-        <span>Status: closed</span>
+        <span>Status: {status}</span>
       </div>
       <div>
         <TextInput

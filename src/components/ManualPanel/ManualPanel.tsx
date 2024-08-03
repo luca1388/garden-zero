@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./ManualPanel.module.css";
 import ValvePanel from "./ValvePanel/ValvePanel";
 import { Valve } from "@/models/ValveController";
+import { Loading } from "@carbon/react";
 
 export enum ValveType {
   Z1 = "zone-1",
@@ -17,6 +18,9 @@ const ManualPanel = () => {
   const [timeoutZone3, setTimeoutZone3] = useState<number>(5);
   const [timeoutZone4, setTimeoutZone4] = useState<number>(5);
 
+  const [timeoutZones, setTimeoutZones] =
+    useState<{ id: string; timeout: number }[]>();
+
   const fetchValveStatus = async () => {
     fetch("/api/v1/valves/status")
       .then((response) => response.json())
@@ -24,7 +28,7 @@ const ManualPanel = () => {
         console.log(data);
 
         const openedValve = data.valves.find(
-          (valve: Valve) => valve.status === "OPENED",
+          (valve: Valve) => valve.status === "OPENED"
         )?.id;
 
         if (openedValve) {
@@ -40,15 +44,23 @@ const ManualPanel = () => {
     fetchValveStatus();
   }, []);
 
+  useEffect(() => {
+    if (valveStatus) {
+      setTimeoutZones(
+        valveStatus.map((valve) => ({ id: valve.id, timeout: 5 }))
+      );
+    }
+  }, [valveStatus]);
+
   const clickHandler = ({
     id,
-    timeout,
+    timeout = 1,
   }: {
     id: ValveType;
-    timeout: number;
+    timeout?: number;
   }) => {
     const timeoutMs = timeout * 60 * 1000;
-    fetch(`/api/v1/valves/${name}`, {
+    fetch(`/api/v1/valves/${id}`, {
       method: "POST",
       body: JSON.stringify({
         timeout: timeoutMs,
@@ -69,57 +81,45 @@ const ManualPanel = () => {
       fetchValveStatus();
     }, timeoutMs + 5000);
   };
+
+  const changeHandler = ({
+    value,
+    valveId,
+  }: {
+    value: number;
+    valveId: string;
+  }) => {
+    const updatedTimeoutZones = timeoutZones?.map((timeout) =>
+      timeout.id === valveId ? { ...timeout, timeout: value } : timeout
+    );
+    setTimeoutZones(updatedTimeoutZones);
+  };
   return (
     <div className={styles.ManualPanel}>
       <h1 className={styles.ManualPanel_title}>GardenZero: Manual mode</h1>
 
-      <div className={styles.ManualPanel_row}>
-        <ValvePanel
-          name={ValveType.Z1}
-          id={ValveType.Z1}
-          disabled={Boolean(
-            enabledValveName !== "" && enabledValveName !== ValveType.Z1,
-          )}
-          onClick={clickHandler}
-          onChange={(value) => setTimeoutZone1(value)}
-          value={timeoutZone1}
-          loading={!!valveStatus}
-        />
-        <ValvePanel
-          name={ValveType.Z2}
-          id={ValveType.Z2}
-          disabled={
-            enabledValveName !== "" && enabledValveName !== ValveType.Z2
-          }
-          onClick={clickHandler}
-          onChange={(value) => setTimeoutZone2(value)}
-          value={timeoutZone2}
-          loading={!!valveStatus}
-        />
-      </div>
-      <div className={styles.ManualPanel_row}>
-        <ValvePanel
-          name={ValveType.Z3}
-          id={ValveType.Z3}
-          disabled={
-            enabledValveName !== "" && enabledValveName !== ValveType.Z3
-          }
-          onClick={clickHandler}
-          onChange={(value) => setTimeoutZone3(value)}
-          value={timeoutZone3}
-          loading={!!valveStatus}
-        />
-        <ValvePanel
-          name={ValveType.Z4}
-          id={ValveType.Z4}
-          disabled={
-            enabledValveName !== "" && enabledValveName !== ValveType.Z4
-          }
-          onClick={clickHandler}
-          onChange={(value) => setTimeoutZone4(value)}
-          value={timeoutZone4}
-          loading={!!valveStatus}
-        />
+      <div className={styles.ManualPanel_grid}>
+        {!valveStatus && <Loading withOverlay={false} />}
+
+        {valveStatus?.map((valve) => {
+          const timeoutValue =
+            timeoutZones?.find((zone) => zone.id === valve.id)?.timeout || 5;
+          return (
+            <ValvePanel
+              key={valve.id}
+              name={valve.name}
+              id={valve.id}
+              disabled={Boolean(
+                enabledValveName !== "" && enabledValveName !== valve.id
+              )}
+              onClick={clickHandler}
+              onChange={(value) => changeHandler({ valveId: valve.id, value })}
+              value={timeoutValue}
+              loading={!!valveStatus}
+              status={enabledValveName === valve.id ? "OPENED" : "CLOSED"}
+            />
+          );
+        })}
       </div>
     </div>
   );

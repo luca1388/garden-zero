@@ -14,9 +14,10 @@
   margin: 0 0 8px 0;
 }
 
-.ManualPanel .ManualPanel_row {
+.ManualPanel .ManualPanel_grid {
   display: flex;
   align-items: center;
   justify-content: space-around;
   width: 100%;
+  flex-wrap: wrap;
 }
